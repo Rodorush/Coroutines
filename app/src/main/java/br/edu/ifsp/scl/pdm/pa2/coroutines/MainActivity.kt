@@ -26,17 +26,15 @@ class MainActivity : AppCompatActivity() {
             var upperText = "Upper before sleep"
             var lowerText = "Lower before sleep"
 
-            GlobalScope.launch {
+            GlobalScope.launch(Dispatchers.Main) {
                 upperText = sleep("Upper", random.nextLong(SLEEP_LIMIT))
                 lowerText = sleep("Lower", random.nextLong(SLEEP_LIMIT))
                 Log.v(
                     getString(R.string.app_name),
                     "Coroutine thread: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
                 )
-                runOnUiThread {
-                    amb.upperTv.text = upperText
-                    amb.lowerTv.text = lowerText
-                }
+                amb.upperTv.text = upperText
+                amb.lowerTv.text = lowerText
             }
             Log.v(getString(R.string.app_name), "Main thread: ${Thread.currentThread().name}")
         }
