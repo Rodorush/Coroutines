@@ -27,23 +27,21 @@ class MainActivity : AppCompatActivity() {
             var lowerText = "Lower before sleep"
 
             GlobalScope.launch(Dispatchers.Main) {
-                upperText = sleep("Upper", random.nextLong(SLEEP_LIMIT))
-                Log.v(
-                    getString(R.string.app_name),
-                    "Coroutine thread: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
-                )
-                amb.upperTv.text = upperText
-            }
-
-            GlobalScope.launch(Dispatchers.Unconfined) {
-                lowerText = sleep("Lower", random.nextLong(SLEEP_LIMIT))
-                Log.v(
-                    getString(R.string.app_name),
-                    "Coroutine thread: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
-                )
-                runOnUiThread {
-                    amb.lowerTv.text = lowerText
+                val upperJob = launch {
+                    upperText = sleep("Upper", random.nextLong(SLEEP_LIMIT))
                 }
+                val lowerJob = launch {
+                    lowerText = sleep("Lower", random.nextLong(SLEEP_LIMIT))
+                }
+                upperJob.join()
+
+                amb.upperTv.text = upperText
+                amb.lowerTv.text = lowerText
+                Log.v(
+                    getString(R.string.app_name),
+                    "Coroutine thread: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
+                )
+
             }
 
             Log.v(getString(R.string.app_name), "Main thread: ${Thread.currentThread().name}")
