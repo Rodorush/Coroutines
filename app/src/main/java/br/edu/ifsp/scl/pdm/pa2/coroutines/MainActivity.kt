@@ -31,18 +31,19 @@ class MainActivity : AppCompatActivity() {
                     "Top coroutine thread: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
                 )
 
-                withContext(coroutineContext) {
+                val upper = sleep("Upper", random.nextLong(SLEEP_LIMIT))
+                withContext(Dispatchers.Main + Job()) {
                     Log.v(
                         getString(R.string.app_name),
-                        "Upper coroutine thread: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
+                        "But this code is executing in thread: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
                     )
-                    sleep("Upper", random.nextLong(SLEEP_LIMIT)).let {
-                        runOnUiThread {
-                            amb.upperTv.text = it
-                        }
-                    }
-                    Log.v(getString(R.string.app_name), "Upper coroutine completed.")
+                    amb.upperTv.text = upper
                 }
+
+                Log.v(
+                    getString(R.string.app_name),
+                    "Top coroutine thread after main: ${Thread.currentThread().name}, Job: ${this.coroutineContext[Job]}"
+                )
 
                 launch(Dispatchers.IO) {
                     Log.v(
